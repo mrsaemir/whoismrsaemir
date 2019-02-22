@@ -1,11 +1,16 @@
+import re
 import bs4 as bs
 import urllib.request
 import datetime
 
 
+# note : the class behaviour on unsupported domains may be unpredictable and may be not true.
+# currently, fully supported domains are: .com and .ir
 class WhoIsMrSaemir:
     def __init__(self, url):
-        self.url = url
+        self.url = url.lower()
+        if self.url.count('.') != 1:
+            raise ValueError("Non standard url, Enter your url like the example: 'gitlab.com'")
 
     def _ir_whois_expiration(self):
         sauce = urllib.request.urlopen('https://who.is/whois/%s' % self.url)
@@ -33,7 +38,6 @@ class WhoIsMrSaemir:
             return None
 
     def is_ir(self):
-        import re
         return bool(re.search(r'.ir', self.url))
 
     def get_expiration(self):
