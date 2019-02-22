@@ -63,3 +63,33 @@ class WhoIsMrSaemir:
         if not expiration:
             return 0
         return (expiration - datetime.datetime.now()).days
+
+
+# a function that checks if any of the domains
+# requested in the list are available to buy, should be deleted from dailt query
+# or should wait on them
+def check_domain_status(url_core):
+    result = {}
+    supported_postfixes = ['ir', 'com', 'net']
+    for postfix in supported_postfixes:
+        whois = WhoIsMrSaemir(url=url_core + '.' + postfix)
+        days = whois.days_till_expiration()
+        if days > 30:
+            # they have purchased for another year, shit!
+            result[postfix] = 'delete'
+        elif 2 <= days <= 30:
+            result[postfix] = 'wait'
+        elif days == 1:
+            result[postfix] = 'ready'
+        else:
+            result[postfix] = 'buy'
+    return result
+
+
+def domain_should_be_deleted_from_daily_checks(status):
+    delete = True
+    for postfix in status:
+        if status[postfix] != 'delete':
+            delete = False
+            return delete
+    return delete
