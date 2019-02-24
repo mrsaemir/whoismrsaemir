@@ -18,12 +18,15 @@ class Domains(models.Model):
                                          gday=self.added_dt.day)
         return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
 
-    def save(self, *args, **kwargs):
-        status, self.count_down_status = check_domain_status(self.url_core)
-        super(Domains, self).save(*args, **kwargs)
-
     def get_count_down_status(self):
         today = datetime.date.today()
+        # if no count_down in obj instance
+        if not self.count_down_status:
+            status, count_down = check_domain_status(self.url_core)
+            self.count_down_status = count_down
+            self.save()
+            return count_down
+        # updating existing status
         if today != self.last_check:
             status, count_down = check_domain_status(self.url_core)
             self.count_down_status = count_down
