@@ -3,7 +3,7 @@ import bs4 as bs
 import urllib.request
 import datetime
 
-supported_postfixes = ['ir', 'com', 'net']
+supported_postfixes = ['ir', 'com', 'net', 'info', 'org']
 
 
 # note : the class behaviour on unsupported domains may be unpredictable and may be not true.
@@ -71,13 +71,19 @@ class WhoIsMrSaemir:
 # requested in the list are available to buy, should be deleted from daily query
 # or should wait on them. it also returns count down number to expiration date.
 def check_domain_status(url_core):
-    status = {}
     expiration_count_down = {}
     global supported_postfixes
     for postfix in supported_postfixes:
         whois = WhoIsMrSaemir(url=url_core + '.' + postfix)
         days = whois.days_till_expiration()
         expiration_count_down[postfix] = days
+    status = judge_status_based_on_days(expiration_count_down)
+    return status, expiration_count_down
+
+
+def judge_status_based_on_days(count_down_status):
+    status = {}
+    for postfix, days in count_down_status.items():
         if days > 30:
             # they have purchased for another year, shit!
             status[postfix] = 'delete'
@@ -87,7 +93,7 @@ def check_domain_status(url_core):
             status[postfix] = 'ready'
         else:
             status[postfix] = 'buy'
-    return status, expiration_count_down
+    return status
 
 
 def domain_should_be_deleted_from_daily_checks(status):
