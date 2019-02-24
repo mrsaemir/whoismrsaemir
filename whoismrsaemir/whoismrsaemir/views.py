@@ -49,3 +49,9 @@ def daily_check(request):
             # modifying last check(setting it to today).
             domain.save()
     return HttpResponse('OK', status=200)
+
+
+def weekly_check(request):
+    domains = Domains.objects.all()
+    for domain in domains:
+        pass
