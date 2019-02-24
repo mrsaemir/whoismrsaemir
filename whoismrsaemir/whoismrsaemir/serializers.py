@@ -1,16 +1,18 @@
 from rest_framework import serializers
 from rest_framework.reverse import reverse
+import jdatetime
 from .models import Domains
 
 
 class DomainsSerializer(serializers.ModelSerializer):
     added_on = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
+    expiration_count_down = serializers.SerializerMethodField()
+    last_check = serializers.SerializerMethodField()
 
     class Meta:
         model = Domains
-        fields = ('url_core', 'added_on', 'links')
-        lookup_field = 'url_core'
+        fields = ('url_core', 'added_on', 'last_check', 'expiration_count_down', 'links')
         extra_kwargs = {
             'url': {'lookup_field': 'url_core'}
         }
@@ -21,8 +23,18 @@ class DomainsSerializer(serializers.ModelSerializer):
             'self': reverse('domain-detail', kwargs={'url_core': obj.url_core}, request=request)
         }
 
-    def get_added_on(self, obj):
-        import jdatetime
+    @staticmethod
+    def get_added_on(obj):
         dt = obj.added_dt
+        dt = jdatetime.GregorianToJalali(gyear=dt.year, gmonth=dt.month, gday=dt.day)
+        return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
+
+    @staticmethod
+    def get_expiration_count_down(obj):
+        return obj.get_count_down_status()
+
+    @staticmethod
+    def get_last_check(obj):
+        dt = obj.last_check
         dt = jdatetime.GregorianToJalali(gyear=dt.year, gmonth=dt.month, gday=dt.day)
         return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)

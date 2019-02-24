@@ -6,3 +6,4 @@ whois==0.7
 Django==2.1.2
 djangorestframework==3.9.0
 jdatetime==3.2.0
+jsonfield==2.0.2
