@@ -31,7 +31,7 @@ class DomainsSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_expiration_count_down(obj):
-        return obj.get_count_down_status()
+        return obj.count_down_status
 
     @staticmethod
     def get_last_check(obj):

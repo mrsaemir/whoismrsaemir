@@ -35,6 +35,14 @@ class Domains(models.Model):
             count_down = self.count_down_status
         return count_down
 
+    def add_to_daily_checks(self):
+        if not DailyDomainChecks.objects.filter(url_core=self):
+            obj = DailyDomainChecks()
+            obj.url_core = self
+            obj.save()
+            return obj
+        return None
+
 
 # this list is checked every day.
 # for urls with higher possibility (urls with expiration with less than 30 days)
