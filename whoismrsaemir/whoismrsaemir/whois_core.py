@@ -2,17 +2,20 @@ import re
 import bs4 as bs
 import urllib.request
 import datetime
-
+import threading
 supported_postfixes = ['ir', 'com', 'net', 'info', 'org']
 
 
 # note : the class behaviour on unsupported domains may be unpredictable and may be not true.
 # currently, fully supported domains are: .com and .ir
-class WhoIsMrSaemir:
+class WhoIsMrSaemir(threading.Thread):
     def __init__(self, url):
+        threading.Thread.__init__(self)
         self.url = url.lower()
         if self.url.count('.') != 1:
             raise ValueError("Non standard url, Enter your url like the example: 'gitlab.com'")
+        self.expiration = None
+        self.core, self.postfix = self.url.split('.')
 
     def _ir_whois_expiration(self):
         sauce = urllib.request.urlopen('https://who.is/whois/%s' % self.url)
@@ -43,14 +46,18 @@ class WhoIsMrSaemir:
         return bool(re.search(r'.ir', self.url))
 
     def get_expiration(self):
+        if self.expiration:
+            return self.expiration
+
         if self.is_ir():
-            return self._ir_whois_expiration()
+            self.expiration = self._ir_whois_expiration()
         else:
             expiration = self._non_ir_whois_expiration()
             if isinstance(expiration, list):
-                return expiration[0]
+                self.expiration = expiration[0]
             else:
-                return expiration
+                self.expiration = expiration
+        return self.expiration
 
     def can_buy(self):
         expiration = self.get_expiration()
@@ -66,6 +73,9 @@ class WhoIsMrSaemir:
             return 0
         return (expiration - datetime.datetime.now()).days
 
+    def run(self):
+        return self.get_expiration()
+
 
 # a function that checks if any of the domains
 # requested in the list are available to buy, should be deleted from daily query
@@ -73,10 +83,16 @@ class WhoIsMrSaemir:
 def check_domain_status(url_core):
     expiration_count_down = {}
     global supported_postfixes
+    threads = []
     for postfix in supported_postfixes:
-        whois = WhoIsMrSaemir(url=url_core + '.' + postfix)
-        days = whois.days_till_expiration()
-        expiration_count_down[postfix] = days
+        threads.append(WhoIsMrSaemir(url=url_core + '.' + postfix))
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+    for thread in threads:
+        days = thread.days_till_expiration()
+        expiration_count_down[thread.postfix] = days
     status = judge_status_based_on_days(expiration_count_down)
     return status, expiration_count_down
 
