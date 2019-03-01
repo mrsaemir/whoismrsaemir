@@ -9,6 +9,8 @@ COPY . /whois
 
 EXPOSE 8000
 
+RUN apt update && apt install -y curl cron
+
 RUN pip install -r whoismrsaemir/requirements.txt
 
 RUN chmod +x ./whoismrsaemir/entrypoint.sh

@@ -1,0 +1,2 @@
+0 0 * * * curl http://127.0.0.1:8000/daily_check/
+0 0 * * 6 curl http://127.0.0.1:8000/weekly_check/
