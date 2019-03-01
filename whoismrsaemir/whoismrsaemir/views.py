@@ -51,6 +51,9 @@ def daily_check(request):
 
 
 def weekly_check(request):
+    from django.core.mail import EmailMessage
+    email = EmailMessage("hello", "world", to=["saemiamirhossein@gmail.com"])
+    email.send()
     domains = Domains.objects.all()
     for domain in domains:
         # updating info on domain model
