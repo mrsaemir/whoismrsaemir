@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 import jdatetime
 from .models import Domains
-
+import datetime
 
 class DomainsSerializer(serializers.ModelSerializer):
     added_on = serializers.SerializerMethodField()
@@ -37,4 +37,7 @@ class DomainsSerializer(serializers.ModelSerializer):
     def get_last_check(obj):
         dt = obj.last_check
         dt = jdatetime.GregorianToJalali(gyear=dt.year, gmonth=dt.month, gday=dt.day)
-        return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
+        res = "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
+        if obj.last_check == datetime.date.today():
+            res += "(today)"
+        return res
