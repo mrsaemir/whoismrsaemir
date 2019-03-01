@@ -43,12 +43,10 @@ def daily_check(request):
                 # if it is wait then just leave it until tomorrow.
                 if action == 'ready':
                     # send an email saying tomorrow is the day.
-                    send_message(text="%s : " + domain + "." + postfix + "will be ready to buy tomorrow." %
-                                      jdatetime.date.today())
+                    send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " will be ready to buy tomorrow.")
                 elif action == 'buy':
                     # send an email saying today is the day
-                    send_message(text="%s : " + domain + "." + postfix + "is ready to buy today." %
-                                      jdatetime.date.today())
+                    send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " is ready to buy today.")
             # modifying last check(setting it to today).
             domain.save()
     send_message(text="%s : Daily Check Executed Successfully." % jdatetime.date.today())
@@ -65,12 +63,10 @@ def weekly_check(request):
             domain.add_to_daily_checks()
         for postfix, action in res.items():
             if action == 'ready':
-                send_message(text="%s : " + domain + "." + postfix + "will be ready to buy tomorrow." %
-                                  jdatetime.date.today())
-                pass
+                send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " will be ready to buy tomorrow.")
+
             elif action == 'buy':
                 # send an email and say today is the day.
-                send_message(text="%s : " + domain + "." + postfix + "is ready to buy today." %
-                                  jdatetime.date.today())
+                send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " is ready to buy today.")
     send_message(text="%s : Weekly Check Executed Successfully." % jdatetime.date.today())
     return HttpResponseRedirect(reverse('domain-list'))

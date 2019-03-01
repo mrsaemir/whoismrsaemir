@@ -36,6 +36,8 @@ class DomainsSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_last_check(obj):
+        if not obj.count_down_status:
+            return "Not Checked."
         dt = obj.last_check
         dt = jdatetime.GregorianToJalali(gyear=dt.year, gmonth=dt.month, gday=dt.day)
         res = "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
