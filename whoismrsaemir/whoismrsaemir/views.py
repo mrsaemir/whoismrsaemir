@@ -1,10 +1,12 @@
 import datetime
-from django.http import HttpResponse
+from django.http import HttpResponseRedirect
 from rest_framework import viewsets, authentication, permissions
 from .serializers import DomainsSerializer
 from .models import Domains, DailyDomainChecks
 from .whois_core import check_domain_status, domain_should_be_deleted_from_daily_checks,\
     judge_status_based_on_days, domain_should_be_added_to_daily_checks
+from rest_framework.reverse import reverse
+
 
 class AdminMixin:
     authentication_classes = (
@@ -45,7 +47,7 @@ def daily_check(request):
                     pass
             # modifying last check(setting it to today).
             domain.save()
-    return HttpResponse('OK', status=200)
+    return HttpResponseRedirect(reverse('domain-list'))
 
 
 def weekly_check(request):
@@ -63,4 +65,4 @@ def weekly_check(request):
             elif action == 'buy':
                 # send an email and say today is the day.
                 pass
-    return HttpResponse('OK', status=200)
+    return HttpResponseRedirect(reverse('domain-list'))
