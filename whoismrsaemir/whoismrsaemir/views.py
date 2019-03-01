@@ -6,6 +6,8 @@ from .models import Domains, DailyDomainChecks
 from .whois_core import check_domain_status, domain_should_be_deleted_from_daily_checks,\
     judge_status_based_on_days, domain_should_be_added_to_daily_checks
 from rest_framework.reverse import reverse
+from .telegram import send_message
+import jdatetime
 
 
 class AdminMixin:
@@ -41,12 +43,15 @@ def daily_check(request):
                 # if it is wait then just leave it until tomorrow.
                 if action == 'ready':
                     # send an email saying tomorrow is the day.
-                    pass
+                    send_message(text="%s : " + domain + "." + postfix + "will be ready to buy tomorrow." %
+                                      jdatetime.date.today())
                 elif action == 'buy':
                     # send an email saying today is the day
-                    pass
+                    send_message(text="%s : " + domain + "." + postfix + "is ready to buy today." %
+                                      jdatetime.date.today())
             # modifying last check(setting it to today).
             domain.save()
+    send_message(text="%s : Daily Check Executed Successfully." % jdatetime.date.today())
     return HttpResponseRedirect(reverse('domain-list'))
 
 
@@ -60,9 +65,12 @@ def weekly_check(request):
             domain.add_to_daily_checks()
         for postfix, action in res.items():
             if action == 'ready':
-                # send an email and say tomorrow is the day.
+                send_message(text="%s : " + domain + "." + postfix + "will be ready to buy tomorrow." %
+                                  jdatetime.date.today())
                 pass
             elif action == 'buy':
                 # send an email and say today is the day.
-                pass
+                send_message(text="%s : " + domain + "." + postfix + "is ready to buy today." %
+                                  jdatetime.date.today())
+    send_message(text="%s : Weekly Check Executed Successfully." % jdatetime.date.today())
     return HttpResponseRedirect(reverse('domain-list'))

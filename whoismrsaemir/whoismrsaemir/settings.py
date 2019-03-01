@@ -67,6 +67,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'whoismrsaemir.wsgi.application'
 
+# notifying using telegram bot
+TELEGRAM_BOT_TOKEN = "749402436:AAHYKmPdoObGIMoytjYI525aLGvgpUxFv3o"
+
+OWNER_TELEGRAM_USERNAME = "@mrsaemirwhoisnotifier"
 
 # Database
 DATABASES = {

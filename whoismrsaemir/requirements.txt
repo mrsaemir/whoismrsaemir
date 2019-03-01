@@ -7,3 +7,4 @@ Django==2.1.2
 djangorestframework==3.9.0
 jdatetime==3.2.0
 jsonfield==2.0.2
+python-telegram-bot==6.1.0

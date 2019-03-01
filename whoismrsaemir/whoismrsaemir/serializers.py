@@ -4,6 +4,7 @@ import jdatetime
 from .models import Domains
 import datetime
 
+
 class DomainsSerializer(serializers.ModelSerializer):
     added_on = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
