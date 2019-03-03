@@ -35,9 +35,9 @@ class WhoIsMrSaemir(threading.Thread):
             return None
 
     def _non_ir_whois_expiration(self):
-        from whois import whois
+        from whois import whois as who_is
         try:
-            query = whois(url=self.url)
+            query = who_is(url=self.url)
             return query.expiration_date
         except:
             raise
