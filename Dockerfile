@@ -9,9 +9,9 @@ COPY . /whois
 
 EXPOSE 8000
 
-RUN apt update && apt install -y curl cron
+RUN apt update && apt install -y curl cron python3-pip
 
-RUN pip install -r whoismrsaemir/requirements.txt
+RUN pip3 install -r whoismrsaemir/requirements.txt
 
 RUN chmod +x ./whoismrsaemir/entrypoint.sh
 
