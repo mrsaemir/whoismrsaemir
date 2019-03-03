@@ -40,7 +40,7 @@ class WhoIsMrSaemir(threading.Thread):
             query = whois(url=self.url)
             return query.expiration_date
         except:
-            return None
+            raise
 
     def is_ir(self):
         return bool(re.search(r'.ir', self.url))
