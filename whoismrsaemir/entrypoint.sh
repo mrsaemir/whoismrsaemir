@@ -1,6 +1,7 @@
 #!/bin/bash
 
 crontab ./whoismrsaemir/cronjobs
+service cron start
 python3 ./whoismrsaemir/manage.py makemigrations
 python3 ./whoismrsaemir/manage.py migrate
 python3 ./whoismrsaemir/manage.py createsuperuser
