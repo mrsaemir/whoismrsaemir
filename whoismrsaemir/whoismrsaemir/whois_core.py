@@ -17,31 +17,6 @@ class WhoIsMrSaemir(threading.Thread):
         self.expiration = None
         self.core, self.postfix = self.url.split('.')
 
-    def _ir_whois_expiration(self):
-        sauce = urllib.request.urlopen('https://who.is/whois/%s' % self.url)
-        soup = bs.BeautifulSoup(sauce, 'lxml')
-        texts = soup.text.split()
-        i = 0
-        j = 0
-        for s in texts:
-            if s == 'expire-date:':
-                j = i
-                break
-            i += 1
-        try:
-            dt = datetime.datetime.strptime(texts[j + 1], '%Y-%m-%d')
-            return dt
-        except:
-            return None
-
-    def _non_ir_whois_expiration(self):
-        from whois import whois as who_is
-        try:
-            query = who_is(url=self.url)
-            return query.expiration_date
-        except:
-            raise
-
     def is_ir(self):
         return bool(re.search(r'.ir', self.url))
 
@@ -49,15 +24,27 @@ class WhoIsMrSaemir(threading.Thread):
         if self.expiration:
             return self.expiration
 
-        if self.is_ir():
-            self.expiration = self._ir_whois_expiration()
+        sauce = urllib.request.urlopen('https://who.is/whois/%s' % self.url)
+        soup = bs.BeautifulSoup(sauce, 'lxml')
+        if self.url.split('.')[1] == 'ir':
+            ex = 'expire-date:'
+            dp = 1
         else:
-            expiration = self._non_ir_whois_expiration()
-            if isinstance(expiration, list):
-                self.expiration = expiration[0]
-            else:
-                self.expiration = expiration
-        return self.expiration
+            ex = 'Expires'
+            dp = 2
+        list = soup.text.split()
+        i = 0
+        j = 0
+        for s in list:
+            if s == ex:
+                j = i
+                break
+            i += 1
+        try:
+            dt = datetime.datetime.strptime(list[j + dp], '%Y-%m-%d')
+            return dt
+        except:
+            return None
 
     def can_buy(self):
         expiration = self.get_expiration()
