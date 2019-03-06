@@ -1,3 +1,3 @@
 0 0 * * * curl -l http://127.0.0.1:8000/daily_check/
-* * * * * curl -l http://127.0.0.1:8000/weekly_check/
+0 0 * * 6 curl -l http://127.0.0.1:8000/weekly_check/
 
