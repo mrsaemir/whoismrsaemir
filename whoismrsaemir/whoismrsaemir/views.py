@@ -78,3 +78,21 @@ def weekly_check(request):
     send_message(text="%s : Weekly Check Executed Successfully." % jdatetime.date.today())
     return HttpResponseRedirect(reverse('domain-list'))
 
+
+def check_newly_added(request):
+    domains = Domains.objects.filter(count_down_status=None)
+    for domain in domains:
+        count_down = domain.get_count_down_status()
+        res = judge_status_based_on_days(count_down)
+        if domain_should_be_added_to_daily_checks(res):
+            domain.add_to_daily_checks()
+        for postfix, action in res.items():
+            url = domain.url_core + "." + postfix
+            if action == 'ready':
+                send_message(text="%s : " % jdatetime.date.today() + url + " will be ready to buy tomorrow.")
+            elif action == 'buy':
+                # send an email and say today is the day.
+                send_message(text="%s : " % jdatetime.date.today() + url + " is ready to buy today.")
+        # this will cause the function to run one item in each run
+        return HttpResponseRedirect(reverse('domain-list'))
+

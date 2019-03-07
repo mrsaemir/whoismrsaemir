@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.urls import re_path, include
 from rest_framework.routers import DefaultRouter
-from .views import DomainsViewSet, daily_check, weekly_check
+from .views import DomainsViewSet, daily_check, weekly_check, check_newly_added
 
 router = DefaultRouter()
 router.register(r'', DomainsViewSet, base_name='domain')
@@ -23,5 +23,6 @@ router.register(r'', DomainsViewSet, base_name='domain')
 urlpatterns = [
     re_path(r'^daily_check/$', daily_check),
     re_path(r'^weekly_check/$', weekly_check),
+    re_path(r'^new/$', check_newly_added),
     re_path(r'', include(router.urls)),
 ]
