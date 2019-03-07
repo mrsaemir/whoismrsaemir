@@ -8,6 +8,7 @@ supported_postfixes = ['ir', 'com', 'net', 'info', 'org']
 
 # note : the class behaviour on unsupported domains may be unpredictable and may be not true.
 # currently, fully supported domains are: .com and .ir
+# this function returns -1 if there is no information.
 class WhoIsMrSaemir(threading.Thread):
     def __init__(self, url):
         threading.Thread.__init__(self)
@@ -42,6 +43,7 @@ class WhoIsMrSaemir(threading.Thread):
             i += 1
         try:
             dt = datetime.datetime.strptime(list[j + dp], '%Y-%m-%d')
+            self.expiration = dt
             return dt
         except:
             return None
@@ -49,7 +51,7 @@ class WhoIsMrSaemir(threading.Thread):
     def can_buy(self):
         expiration = self.get_expiration()
         if not expiration:
-            return True
+            return -1
         if expiration <= datetime.datetime.now():
             return True
         return False
@@ -57,7 +59,7 @@ class WhoIsMrSaemir(threading.Thread):
     def days_till_expiration(self):
         expiration = self.get_expiration()
         if not expiration:
-            return 0
+            return -1
         return (expiration - datetime.datetime.now()).days
 
     def run(self):
@@ -94,18 +96,18 @@ def judge_status_based_on_days(count_down_status):
             status[postfix] = 'wait'
         elif days == 1:
             status[postfix] = 'ready'
+        elif days == -1:
+            status[postfix] = 'no-info'
         else:
             status[postfix] = 'buy'
     return status
 
 
 def domain_should_be_deleted_from_daily_checks(status):
-    delete = True
     for postfix, action in status.items():
         if action != 'delete':
-            delete = False
-            return delete
-    return delete
+            return False
+    return True
 
 
 def domain_should_be_added_to_daily_checks(status):

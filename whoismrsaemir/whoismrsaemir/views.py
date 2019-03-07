@@ -40,13 +40,17 @@ def daily_check(request):
             domain.delete()
         else:
             for postfix, action in status.item():
+                url = domain.url_core.url_core + '.' + postfix
                 # if it is wait then just leave it until tomorrow.
                 if action == 'ready':
                     # send an email saying tomorrow is the day.
-                    send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " will be ready to buy tomorrow.")
+                    send_message(text="%s : " % jdatetime.date.today() + url + " will be ready to buy tomorrow.")
                 elif action == 'buy':
                     # send an email saying today is the day
-                    send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " is ready to buy today.")
+                    send_message(text="%s : " % jdatetime.date.today() + url + " is ready to buy today.")
+                elif action == 'no-info':
+                    send_message(
+                        text="There is a problem detecting datetime for domain %s " % url)
             # modifying last check(setting it to today).
             domain.save()
     send_message(text="%s : Daily Check Executed Successfully." % jdatetime.date.today())
@@ -62,11 +66,15 @@ def weekly_check(request):
         if domain_should_be_added_to_daily_checks(res):
             domain.add_to_daily_checks()
         for postfix, action in res.items():
+            url = domain.url_core + "." + postfix
             if action == 'ready':
-                send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " will be ready to buy tomorrow.")
-
+                send_message(text="%s : " % jdatetime.date.today() + url + " will be ready to buy tomorrow.")
             elif action == 'buy':
                 # send an email and say today is the day.
-                send_message(text="%s : " % jdatetime.date.today() + domain.url_core + "." + postfix + " is ready to buy today.")
+                send_message(text="%s : " % jdatetime.date.today() + url + " is ready to buy today.")
+            elif action == 'no-info':
+                send_message(
+                    text="There is a problem detecting datetime for domain %s " % url)
     send_message(text="%s : Weekly Check Executed Successfully." % jdatetime.date.today())
     return HttpResponseRedirect(reverse('domain-list'))
+
