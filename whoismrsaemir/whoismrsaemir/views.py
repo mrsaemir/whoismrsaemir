@@ -5,7 +5,6 @@ from rest_framework import viewsets, authentication, permissions
 from .serializers import DomainsSerializer
 from .models import Domains
 from rest_framework.reverse import reverse
-from .telegram import send_message
 import jdatetime
 
 
