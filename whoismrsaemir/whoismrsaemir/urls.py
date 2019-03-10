@@ -23,6 +23,5 @@ router.register(r'', DomainsViewSet, base_name='domain')
 
 urlpatterns = [
     re_path(r'^run_task/$', run_task),
-    re_path(r'^(?P<url_core>[a-zA-Z]+)/update/$', update_domain_status, name="update-detail"),
     re_path(r'', include(router.urls)),
 ]

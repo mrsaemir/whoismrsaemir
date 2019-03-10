@@ -24,7 +24,6 @@ class DomainsSerializer(serializers.ModelSerializer):
         request = self.context['request']
         return {
             'self': reverse('domain-detail', kwargs={'url_core': obj.url_core}, request=request),
-            'update': reverse('update-detail', kwargs={'url_core': obj.url_core}, request=request),
         }
 
     @staticmethod
