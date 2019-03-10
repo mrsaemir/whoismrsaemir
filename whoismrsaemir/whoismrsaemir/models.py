@@ -2,8 +2,7 @@ import datetime
 from django.db import models
 import jdatetime
 from jsonfield import JSONField
-from .whois_core import (check_domain_status, judge_status_based_on_days,
-    domain_should_be_deleted_from_daily_checks)
+from .whois_core import (check_domain_status, judge_status_based_on_days, domain_should_be_deleted_from_daily_checks)
 from .telegram import send_message as t_message
 from django.conf import settings
 
