@@ -1,10 +1,9 @@
 import datetime
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, authentication, permissions
 from .serializers import DomainsSerializer
-from .models import Domains, DailyDomainChecks
-from .whois_core import check_domain_status, domain_should_be_deleted_from_daily_checks,\
-    judge_status_based_on_days, domain_should_be_added_to_daily_checks
+from .models import Domains
 from rest_framework.reverse import reverse
 from .telegram import send_message
 import jdatetime
@@ -25,74 +24,14 @@ class DomainsViewSet(AdminMixin, viewsets.ModelViewSet):
     lookup_field = 'url_core'
 
 
-def daily_check(request):
-    today = datetime.date.today()
-    domains = DailyDomainChecks.objects.filter(
-        url_core__last_check__year__lt=today.year).filter(
-        url_core__last_check__month__lt=today.month).filter(
-        url_core__last_check__day__lt=today.day)
-    # processing today domains
-    for domain in domains:
-        # domain should be deleted from daily checks because it is registered for another year,
-        # if all the postfix status is 'delete'
-        status, count_down = check_domain_status(domain.url_core.url_core)
-        if domain_should_be_deleted_from_daily_checks(status):
-            domain.delete()
-        else:
-            for postfix, action in status.item():
-                url = domain.url_core.url_core + '.' + postfix
-                # if it is wait then just leave it until tomorrow.
-                if action == 'ready':
-                    # send an email saying tomorrow is the day.
-                    send_message(text="%s : " % jdatetime.date.today() + url + " will be ready to buy tomorrow.")
-                elif action == 'buy':
-                    # send an email saying today is the day
-                    send_message(text="%s : " % jdatetime.date.today() + url + " is ready to buy today.")
-                elif action == 'no-info':
-                    send_message(
-                        text="There is a problem detecting datetime for domain %s " % url)
-            # modifying last check(setting it to today).
-            domain.save()
-    send_message(text="%s : Daily Check Executed Successfully." % jdatetime.date.today())
-    return HttpResponseRedirect(reverse('domain-list'))
-
-
-def weekly_check(request):
-    domains = Domains.objects.all()
-    for domain in domains:
-        # updating info on domain model
-        count_down = domain.get_count_down_status()
-        res = judge_status_based_on_days(count_down)
-        if domain_should_be_added_to_daily_checks(res):
-            domain.add_to_daily_checks()
-        for postfix, action in res.items():
-            url = domain.url_core + "." + postfix
-            if action == 'ready':
-                send_message(text="%s : " % jdatetime.date.today() + url + " will be ready to buy tomorrow.")
-            elif action == 'buy':
-                # send an email and say today is the day.
-                send_message(text="%s : " % jdatetime.date.today() + url + " is ready to buy today.")
-            elif action == 'no-info':
-                send_message(
-                    text="There is a problem detecting datetime for domain %s " % url)
-    send_message(text="%s : Weekly Check Executed Successfully." % jdatetime.date.today())
-    return HttpResponseRedirect(reverse('domain-list'))
-
-
-def check_newly_added(request):
-    domains = Domains.objects.filter(count_down_status=None)
-    for domain in domains:
-        count_down = domain.get_count_down_status()
-        res = judge_status_based_on_days(count_down)
-        if domain_should_be_added_to_daily_checks(res):
-            domain.add_to_daily_checks()
-        for postfix, action in res.items():
-            url = domain.url_core + "." + postfix
-            if action == 'ready':
-                send_message(text="%s : " % jdatetime.date.today() + url + " will be ready to buy tomorrow.")
-            elif action == 'buy':
-                # send an email and say today is the day.
-                send_message(text="%s : " % jdatetime.date.today() + url + " is ready to buy today.")
-        # this will cause the function to run one item in each run
-        return HttpResponseRedirect(reverse('domain-list'))
+def update_domain_status(request, url_core):
+    try:
+        domain = Domains.objects.get(url_core=url_core)
+    except ObjectDoesNotExist:
+        raise
+        raise Http404
+    domain.update()
+    return HttpResponseRedirect(
+        reverse('domain-detail', kwargs={'url_core': domain.url_core}, request=request)
+    )
 

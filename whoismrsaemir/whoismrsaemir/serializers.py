@@ -21,7 +21,8 @@ class DomainsSerializer(serializers.ModelSerializer):
     def get_links(self, obj):
         request = self.context['request']
         return {
-            'self': reverse('domain-detail', kwargs={'url_core': obj.url_core}, request=request)
+            'self': reverse('domain-detail', kwargs={'url_core': obj.url_core}, request=request),
+            'update': reverse('update-detail', kwargs={'url_core': obj.url_core}, request=request),
         }
 
     @staticmethod
