@@ -90,14 +90,23 @@ class Domains(models.Model):
                 return
             for postfix, action in status.items():
                 if action == "ready":
+                    self.next_check = None
+                    self.save()
                     self.notify_about_expiration(chat_id=settings.OWNER_TELEGRAM_USERNAME,
                                                  postfix=postfix)
                 elif action == "buy":
+                    self.next_check = None
+                    self.save()
                     self.notify_expired(chat_id=settings.OWNER_TELEGRAM_USERNAME,
                                         postfix=postfix)
                 elif action == "no-info":
+                    self.next_check = None
+                    self.save()
                     self.notify_problem_detecting_expiration(chat_id=settings.OWNER_TELEGRAM_USERNAME,
                                                              postfix=postfix)
+                elif action == "waiting":
+                    self.next_check = None
+                    self.save()
 
     def save(self, *args, **kwargs):
         super(Domains, self).save(*args, **kwargs)
