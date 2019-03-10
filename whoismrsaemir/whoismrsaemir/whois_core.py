@@ -101,3 +101,10 @@ def judge_status_based_on_days(count_down_status):
         else:
             status[postfix] = 'buy'
     return status
+
+
+def domain_should_be_deleted_from_daily_checks(status):
+    for postfix, action in status.items():
+        if action != 'delete':
+            return False
+    return True
