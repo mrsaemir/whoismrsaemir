@@ -10,10 +10,12 @@ class DomainsSerializer(serializers.ModelSerializer):
     links = serializers.SerializerMethodField()
     expiration_count_down = serializers.SerializerMethodField()
     last_check = serializers.SerializerMethodField()
+    next_check = serializers.SerializerMethodField()
 
     class Meta:
         model = Domains
-        fields = ('url_core', 'added_on', 'last_check', 'expiration_count_down', 'links')
+        fields = ('url_core', 'added_on', 'last_check', 'next_check', 'expiration_count_down',
+                  'links')
         extra_kwargs = {
             'url': {'lookup_field': 'url_core'}
         }
@@ -45,3 +47,13 @@ class DomainsSerializer(serializers.ModelSerializer):
         if obj.last_check == datetime.date.today():
             res += "(today)"
         return res
+
+    @staticmethod
+    def get_next_check(obj):
+        if not obj.next_check:
+            return "NOW"
+        dt = obj.next_check
+        dt = jdatetime.GregorianToJalali(gyear=dt.year, gmonth=dt.month, gday=dt.day)
+        res = "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
+        return res
+
