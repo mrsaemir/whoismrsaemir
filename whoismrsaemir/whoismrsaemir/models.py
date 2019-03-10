@@ -3,6 +3,7 @@ from django.db import models
 import jdatetime
 from jsonfield import JSONField
 from .whois_core import check_domain_status
+from .telegram import send_message as t_message
 
 
 # this list is checked every week.
@@ -18,21 +19,21 @@ class Domains(models.Model):
                                          gday=self.added_dt.day)
         return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
 
-    def update_status(self):
+    def update(self):
         status, count_down = check_domain_status(self.url_core)
         self.count_down_status = count_down
         self.save()
-        return count_down
+        return status, count_down
 
     def get_count_down_status(self):
         # if no count_down in obj instance
         if not self.count_down_status:
-            count_down = self.update_status()
+            status, count_down = self.update()
             return count_down
 
         # updating existing status
         if not self.is_checked_today():
-            count_down = self.update_status()
+            status, count_down = self.update()
         else:
             count_down = self.count_down_status
         return count_down
@@ -43,23 +44,16 @@ class Domains(models.Model):
             return True
         return False
 
-    def add_to_daily_checks(self):
-        if not DailyDomainChecks.objects.filter(url_core=self):
-            obj = DailyDomainChecks()
-            obj.url_core = self
-            obj.save()
-            return obj
-        return None
+    # notifying in telegram if domain is about to expire
+    def notify_about_expiration(self, chat_id, postfix):
+        # postfix is the available domain's postfix. exp: ir, com, org
+        text = f"Domain {self.url_core}.{postfix} is about to expire."
+        t_message(chat_id=chat_id, text=text)
 
+    def notify_expired(self, chat_id, postfix):
+        text = f"Domain {self.url_core}.{postfix} is expired."
+        t_message(chat_id=chat_id, text=text)
 
-# this list is checked every day.
-# for urls with higher possibility (urls with expiration with less than 30 days)
-class DailyDomainChecks(models.Model):
-    added_dt = models.DateTimeField(auto_now_add=True)
-    url_core = models.OneToOneField(Domains, on_delete=models.CASCADE, unique=True)
-
-    def __str__(self):
-        dt = jdatetime.GregorianToJalali(gyear=self.added_dt.year,
-                                         gmonth=self.added_dt.month,
-                                         gday=self.added_dt.day)
-        return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
+    def notify_problem_detecting_expiration(self, chat_id, postfix):
+        text = f"There was a problem detecting expiration date on {self.url_core}.{postfix}."
+        t_message(chat_id=chat_id, text=text)
