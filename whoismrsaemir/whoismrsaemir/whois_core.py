@@ -3,7 +3,7 @@ import bs4 as bs
 import urllib.request
 import datetime
 import threading
-supported_postfixes = ['ir', 'com', 'net', 'info', 'org']
+supported_postfixes = ['ir', 'com', 'org']
 
 
 # note : the class behaviour on unsupported domains may be unpredictable and may be not true.
