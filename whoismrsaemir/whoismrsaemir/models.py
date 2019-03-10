@@ -2,7 +2,7 @@ import datetime
 from django.db import models
 import jdatetime
 from jsonfield import JSONField
-from .whois_core import check_domain_status
+from .whois_core import check_domain_status, judge_status_based_on_days
 from .telegram import send_message as t_message
 
 
@@ -17,7 +17,7 @@ class Domains(models.Model):
         dt = jdatetime.GregorianToJalali(gyear=self.added_dt.year,
                                          gmonth=self.added_dt.month,
                                          gday=self.added_dt.day)
-        return "{}/{}/{}".format(dt.jyear, dt.jmonth, dt.jday)
+        return "{} - {}/{}/{}".format(self.url_core, dt.jyear, dt.jmonth, dt.jday)
 
     def update(self):
         status, count_down = check_domain_status(self.url_core)
@@ -29,16 +29,20 @@ class Domains(models.Model):
         # if no count_down in obj instance
         if not self.count_down_status:
             status, count_down = self.update()
-            return count_down
+            return status, count_down
 
         # updating existing status
         if not self.is_checked_today():
             status, count_down = self.update()
         else:
             count_down = self.count_down_status
-        return count_down
+            status = judge_status_based_on_days(count_down)
+        return status, count_down
 
     def is_checked_today(self):
+        # never checked before
+        if not self.count_down_status:
+            return False
         today = datetime.date.today()
         if self.last_check == today:
             return True
@@ -64,6 +68,11 @@ class Domains(models.Model):
             queue.domain = self
             queue.save()
 
+    def check_domain(self):
+        # process domain if it is not checked today.
+        if not self.is_checked_today():
+            status, count_down = self.get_count_down_status()
+
     def save(self, *args, **kwargs):
         super(Domains, self).save(*args, **kwargs)
         self.add_to_queue()
@@ -79,8 +88,9 @@ class WhoisQueue(models.Model):
         first = WhoisQueue.objects.first()
         if first:
             last = WhoisQueue()
-            last.domain = first
+            last.domain = first.domain
             last.save()
+            first.delete()
             return first.domain
         else:
             return None

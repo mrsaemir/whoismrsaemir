@@ -1,9 +1,9 @@
 import datetime
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, authentication, permissions
 from .serializers import DomainsSerializer
-from .models import Domains
+from .models import Domains, WhoisQueue
 from rest_framework.reverse import reverse
 import jdatetime
 
@@ -34,4 +34,10 @@ def update_domain_status(request, url_core):
         reverse('domain-detail', kwargs={'url_core': domain.url_core}, request=request)
     )
 
+
+def run_task(request):
+    domain = WhoisQueue.dequeue()
+    if domain:
+        domain.check_domain()
+    return HttpResponse("OK")
 
