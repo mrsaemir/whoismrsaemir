@@ -89,10 +89,10 @@ def check_domain_status(url_core):
 def judge_status_based_on_days(count_down_status):
     status = {}
     for postfix, days in count_down_status.items():
-        if days > 30:
+        if days > 50:
             # they have purchased for another year, shit!
             status[postfix] = 'delete'
-        elif 2 <= days <= 30:
+        elif 2 <= days <= 50:
             status[postfix] = 'wait'
         elif days == 1:
             status[postfix] = 'ready'
