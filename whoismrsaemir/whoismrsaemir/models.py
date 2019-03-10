@@ -84,6 +84,9 @@ class Domains(models.Model):
             status, count_down = self.get_count_down_status()
             # nothing is even about expiration
             if domain_should_be_deleted_from_daily_checks(status):
+                # set next check flag
+                self.next_check = datetime.date.today() + datetime.timedelta(days=30)
+                self.save()
                 return
             for postfix, action in status.items():
                 if action == "ready":
