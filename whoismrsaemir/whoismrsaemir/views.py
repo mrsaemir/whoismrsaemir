@@ -34,3 +34,4 @@ def update_domain_status(request, url_core):
         reverse('domain-detail', kwargs={'url_core': domain.url_core}, request=request)
     )
 
+

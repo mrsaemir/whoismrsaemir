@@ -57,3 +57,30 @@ class Domains(models.Model):
     def notify_problem_detecting_expiration(self, chat_id, postfix):
         text = f"There was a problem detecting expiration date on {self.url_core}.{postfix}."
         t_message(chat_id=chat_id, text=text)
+
+    def add_to_queue(self):
+        if not WhoisQueue.objects.filter(domain=self):
+            queue = WhoisQueue()
+            queue.domain = self
+            queue.save()
+
+    def save(self, *args, **kwargs):
+        super(Domains, self).save(*args, **kwargs)
+        self.add_to_queue()
+
+
+# a simple queue for handling whois jobs
+class WhoisQueue(models.Model):
+    domain = models.ForeignKey(Domains, on_delete=models.CASCADE)
+
+    @staticmethod
+    def dequeue():
+        # adding the item, then deleting the first queue item
+        first = WhoisQueue.objects.first()
+        if first:
+            last = WhoisQueue()
+            last.domain = first
+            last.save()
+            return first.domain
+        else:
+            return None
