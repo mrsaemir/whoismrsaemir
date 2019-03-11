@@ -56,6 +56,7 @@ def check_queue(request):
     domains = Domains.objects.count()
     if not jobs == domains:
         WhoisQueue.sync()
-    send_message(f"{str(jdatetime.date.today())}: Queue Checked")
+    send_message(text=f"{str(jdatetime.date.today())}: Queue Checked.")
+    return HttpResponse('OK')
 
 
