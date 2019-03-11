@@ -115,6 +115,10 @@ class Domains(models.Model):
 # a simple queue for handling whois jobs
 class WhoisQueue(models.Model):
     domain = models.ForeignKey(Domains, on_delete=models.CASCADE)
+    added = models.DateTimeField(primary_key=True, auto_now=True)
+
+    def save(self, *args, **kwargs):
+        super(WhoisQueue, self).save(*args, **kwargs)
 
     @staticmethod
     def dequeue():
