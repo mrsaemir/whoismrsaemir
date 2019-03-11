@@ -1,4 +1,3 @@
-import datetime
 from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import viewsets, authentication, permissions
@@ -40,4 +39,19 @@ def run_task(request):
     if domain:
         domain.check_domain()
     return HttpResponse("OK")
+
+
+def refresh_queue(request):
+    from .telegram import send_message
+    # deleting all items of the queue
+    domains = WhoisQueue.objects.all()
+    for domain in domains:
+        domain.delete()
+    # adding all items to queue
+    domains = Domains.objects.all()
+    for domain in domains:
+        domain.add_to_queue()
+    # sending response
+    send_message(text=f'{str(jdatetime.date.today())}: Queue refreshed successfully.')
+    return HttpResponse('OK')
 

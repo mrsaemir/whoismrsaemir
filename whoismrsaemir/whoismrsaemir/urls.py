@@ -15,13 +15,14 @@ Including another URLconf
 """
 from django.urls import re_path, include
 from rest_framework.routers import DefaultRouter
-from .views import DomainsViewSet, update_domain_status, run_task
+from .views import DomainsViewSet, run_task, refresh_queue
 
 router = DefaultRouter()
 router.register(r'', DomainsViewSet, base_name='domain')
 
 
 urlpatterns = [
+    re_path(r'^refresh_queue/$', refresh_queue),
     re_path(r'^run_task/$', run_task),
     re_path(r'', include(router.urls)),
 ]
