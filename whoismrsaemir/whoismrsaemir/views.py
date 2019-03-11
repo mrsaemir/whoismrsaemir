@@ -43,15 +43,19 @@ def run_task(request):
 
 def refresh_queue(request):
     from .telegram import send_message
-    # deleting all items of the queue
-    domains = WhoisQueue.objects.all()
-    for domain in domains:
-        domain.delete()
-    # adding all items to queue
-    domains = Domains.objects.all()
-    for domain in domains:
-        domain.add_to_queue()
+    WhoisQueue.sync()
     # sending response
     send_message(text=f'{str(jdatetime.date.today())}: Queue refreshed successfully.')
     return HttpResponse('OK')
+
+
+# this function is called everyday and it's job is to check db is synced with queue
+def check_queue(request):
+    from .telegram import send_message
+    jobs = WhoisQueue.objects.count()
+    domains = Domains.objects.count()
+    if not jobs == domains:
+        WhoisQueue.sync()
+    send_message(f"{str(jdatetime.date.today())}: Queue Checked")
+
 

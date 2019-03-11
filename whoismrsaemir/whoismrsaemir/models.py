@@ -132,3 +132,14 @@ class WhoisQueue(models.Model):
             return first.domain
         else:
             return None
+
+    @staticmethod
+    def sync():
+        # deleting all items of the queue
+        domains = WhoisQueue.objects.all()
+        for domain in domains:
+            domain.delete()
+        # adding all items to queue
+        domains = Domains.objects.all()
+        for domain in domains:
+            domain.add_to_queue()
