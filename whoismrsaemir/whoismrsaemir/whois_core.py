@@ -92,9 +92,9 @@ def judge_status_based_on_days(count_down_status):
         if days > 50:
             # they have purchased for another year, shit!
             status[postfix] = 'delete'
-        elif 2 <= days <= 50:
+        elif 7 <= days <= 50:
             status[postfix] = 'wait'
-        elif days == 1:
+        elif 0 <= days < 6:
             status[postfix] = 'ready'
         elif days == -1:
             status[postfix] = 'no-info'
