@@ -6,11 +6,6 @@ from .models import Domains
 import datetime
 
 
-def url_core_validator(url_core):
-    if url.count('.') != 1:
-        raise ValidationError("Non Standard UrlCore.")
-
-
 class DomainsSerializer(serializers.ModelSerializer):
     added_on = serializers.SerializerMethodField()
     links = serializers.SerializerMethodField()
