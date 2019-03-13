@@ -1,8 +1,14 @@
 from rest_framework import serializers
+from rest_framework.serializers import ValidationError
 from rest_framework.reverse import reverse
 import jdatetime
 from .models import Domains
 import datetime
+
+
+def url_core_validator(url_core):
+    if url.count('.') != 1:
+        raise ValidationError("Non Standard UrlCore.")
 
 
 class DomainsSerializer(serializers.ModelSerializer):
@@ -19,6 +25,11 @@ class DomainsSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'url': {'lookup_field': 'url_core'}
         }
+
+    def validate(self, data):
+        if data['url_core'].count('.') != 0:
+            raise ValidationError("None Standard UrlCore.")
+        return data
 
     def get_links(self, obj):
         request = self.context['request']
