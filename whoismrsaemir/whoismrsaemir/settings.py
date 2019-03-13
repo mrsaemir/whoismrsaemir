@@ -73,16 +73,18 @@ TELEGRAM_BOT_TOKEN = "749402436:AAHYKmPdoObGIMoytjYI525aLGvgpUxFv3o"
 OWNER_TELEGRAM_USERNAME = "@mrsaemirwhoisnotifier"
 
 # Database
+# DB configurations
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'domains.db',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'whois_db',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'whois_db',
+        'PORT': '5432',
     }
 }
+
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': (
