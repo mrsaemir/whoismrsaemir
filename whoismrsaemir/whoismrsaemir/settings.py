@@ -76,7 +76,7 @@ OWNER_TELEGRAM_USERNAME = "@mrsaemirwhoisnotifier"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'database/domains.db',
+        'NAME': 'domains.db',
         'USER': '',
         'PASSWORD': '',
         'HOST': '',
