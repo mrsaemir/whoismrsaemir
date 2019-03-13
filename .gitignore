@@ -1,5 +1,5 @@
 virenv/*
 .idea/*
-domains.db
+whoismrsaemir/database/domains.db
 *__pycache__/
 whoismrsaemir/whoismrsaemir/migrations/__pycache__/
