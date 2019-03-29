@@ -101,7 +101,7 @@ class Domains(models.Model):
                 elif action == "no-info":
                     self.next_check = None
                     self.save()
-                    self.notify_problem_detecting_expiration(chat_id=settings.OWNER_TELEGRAM_USERNAME,
+                    self.notify_problem_detecting_expiration(chat_id=settings.MAINTAINER_TELEGRAM_USERNAME,
                                                              postfix=postfix)
                 elif action == "waiting":
                     self.next_check = None
