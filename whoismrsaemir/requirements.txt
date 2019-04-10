@@ -1,7 +1,7 @@
 beautifulsoup4==4.7.1
 future==0.17.1
 lxml==4.3.1
-Django==2.1.2
+Django==2.1.6
 djangorestframework==3.9.0
 jdatetime==3.2.0
 jsonfield==2.0.2
